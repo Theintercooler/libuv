@@ -117,7 +117,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c)
 endif()
 
 set(UV_LIBRARY uv CACHE INTERNAL "Uv library")
-add_library(uv ${UV_SRCS})
+add_library(uv STATIC ${UV_SRCS})
 
 set(UV_LIBRARIES ${UV_LIBRARY} ${UV_LIBS} CACHE INTERNAL "Uv libraries")
 set(UV_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE INTERNAL "Uv include directories")
