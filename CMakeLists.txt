@@ -71,7 +71,7 @@ set(UV_POSIX_SRCS
 if(WIN32)
     add_definitions(-D_WIN32_WINNT=0x0502 -DEIO_STACKSIZE=262144 -D_GNU_SOURCE)
     set(UV_SRCS ${UV_WIN32_SRCS} ${UV_COMMON_SRCS})
-    set(UV_LIBS ws2_32)
+    set(UV_LIBS ws2_32 psapi iphlpapi)
 else()
     # POSIX common
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/unix/ev)
