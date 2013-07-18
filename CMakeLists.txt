@@ -116,6 +116,11 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c)
     endif()
 endif()
 
+IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    message("-- Compiling libuv in debug mode")
+    add_definitions( -O3)
+ENDIF()
+
 set(UV_LIBRARY uv CACHE INTERNAL "Uv library")
 add_library(uv STATIC ${UV_SRCS})
 
