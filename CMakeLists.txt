@@ -4,7 +4,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${CMAKE_CURRENT_SOURCE_DIR}/include/uv-private
 	${CMAKE_CURRENT_SOURCE_DIR}/src)
-	
+
 add_definitions(-DHAVE_CONFIG_H)
 
 set(UV_COMMON_SRCS
@@ -123,6 +123,11 @@ ENDIF()
 
 set(UV_LIBRARY uv CACHE INTERNAL "Uv library")
 add_library(uv STATIC ${UV_SRCS})
+
+if(NOT WIN32)
+    target_link_libraries(uv rt)
+endif()
+
 
 set(UV_LIBRARIES ${UV_LIBRARY} ${UV_LIBS} CACHE INTERNAL "Uv libraries")
 set(UV_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE INTERNAL "Uv include directories")
