@@ -86,7 +86,7 @@ else()
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/darwin.c
 			${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c
 			${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fsevents.c)
-        set(UV_LIBS m)
+        set(UV_LIBS m -pthread)
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         add_definitions(-DEV_CONFIG_H=\"config_linux.h\" -DEIO_CONFIG_H=\"config_linux.h\")
         include_directories(src/ares/config_linux)
@@ -96,7 +96,7 @@ else()
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-core.c
 ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-inotify.c
 ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-syscalls.c)
-        set(UV_LIBS rt m)
+        set(UV_LIBS rt m -pthread)
     elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
         add_definitions(-DEV_CONFIG_H=\"config_freebsd.h\" -DEIO_CONFIG_H=\"config_freebsd.h\")
         include_directories(src/ares/config_freebsd)
@@ -105,7 +105,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-syscalls.c)
             ${UV_COMMON_SRCS}
 ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/freebsd.c
 ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c)
-        set(UV_LIBS m pthread)
+        set(UV_LIBS m -pthread)
     else()
     	message(ERROR "Unsupported platform")
     	#	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/aix.c
@@ -119,9 +119,7 @@ set(UV_LIBRARY uv CACHE INTERNAL "Uv library")
 
 add_library(${UV_LIBRARY} STATIC ${UV_SRCS})
 
-if(NOT WIN32)
-    target_link_libraries(${UV_LIBRARY} rt)
-endif()
+target_link_libraries(${UV_LIBRARY} ${UV_LIBS})
 
 
 set(UV_LIBRARIES ${UV_LIBRARY} ${UV_LIBS} CACHE INTERNAL "Uv libraries")
