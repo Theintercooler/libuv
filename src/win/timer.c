@@ -64,11 +64,6 @@ void uv__time_forward(uv_loop_t* loop, uint64_t msecs) {
 }
 
 
-uint64_t uv_now(uv_loop_t* loop) {
-  return loop->time;
-}
-
-
 static int uv_timer_compare(uv_timer_t* a, uv_timer_t* b) {
   if (a->due < b->due)
     return -1;
@@ -162,8 +157,7 @@ int uv_timer_again(uv_timer_t* handle) {
 
   /* If timer_cb is NULL that means that the timer was never started. */
   if (!handle->timer_cb) {
-    uv__set_sys_error(loop, ERROR_INVALID_DATA);
-    return -1;
+    return UV_EINVAL;
   }
 
   if (handle->flags & UV_HANDLE_ACTIVE) {

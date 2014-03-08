@@ -19,16 +19,20 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef UV_LINUX_H
-#define UV_LINUX_H
+#ifndef UV_VERSION_H
+#define UV_VERSION_H
 
-#define UV_PLATFORM_LOOP_FIELDS                                               \
-  uv__io_t inotify_read_watcher;                                              \
-  void* inotify_watchers;                                                     \
-  int inotify_fd;                                                             \
+ /*
+ * Versions with an even minor version (e.g. 0.6.1 or 1.0.4) are API and ABI
+ * stable. When the minor version is odd, the API can change between patch
+ * releases. Make sure you update the -soname directives in configure.ac
+ * and uv.gyp whenever you bump UV_VERSION_MAJOR or UV_VERSION_MINOR (but
+ * not UV_VERSION_PATCH.)
+ */
 
-#define UV_PLATFORM_FS_EVENT_FIELDS                                           \
-  void* watchers[2];                                                          \
-  int wd;                                                                     \
+#define UV_VERSION_MAJOR 0
+#define UV_VERSION_MINOR 11
+#define UV_VERSION_PATCH 22
+#define UV_VERSION_IS_RELEASE 0
 
-#endif /* UV_LINUX_H */
+#endif /* UV_VERSION_H */
