@@ -118,7 +118,6 @@ endif()
 
 set(UV_LIBRARY uv CACHE INTERNAL "Uv library")
 
-tig_add_definitions_for(${UV_LIBRARY})
 add_library(${UV_LIBRARY} STATIC ${UV_SRCS})
 
 if(NOT WIN32)
