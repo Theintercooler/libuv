@@ -47,7 +47,6 @@ set(UV_POSIX_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/async.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/core.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/dl.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/error.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fs.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/getaddrinfo.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/loop.c
