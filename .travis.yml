@@ -1,0 +1,15 @@
+language: c
+before_install:
+  # Install dependencies
+  - sudo apt-get update
+  - sudo apt-get -y install build-essential
+
+script:
+  - (mkdir cmakebuild && cd cmakebuild && cmake .. && make -j5 && cd .. && rm -rf cmakebuild)
+
+compiler:
+  - clang
+  - gcc
+
+notifications:
+  webhooks: http://n.tkte.ch/h/420/2SdyTAY8-1zV3hqbnqo0tJoH
