@@ -25,6 +25,7 @@ set(UV_WIN32_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/win/fs.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/win/fs-event.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/win/getaddrinfo.c
+	${CMAKE_CURRENT_SOURCE_DIR}/src/win/getnameinfo.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/win/handle.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/win/loop-watcher.c
 	${CMAKE_CURRENT_SOURCE_DIR}/src/win/pipe.c
