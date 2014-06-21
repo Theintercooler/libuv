@@ -2,69 +2,69 @@ cmake_minimum_required(VERSION 2.6)
 project(uv C)
 
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${CMAKE_CURRENT_SOURCE_DIR}/include/uv-private
-	${CMAKE_CURRENT_SOURCE_DIR}/src)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/uv-private
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_definitions(-DHAVE_CONFIG_H)
 
 set(UV_COMMON_SRCS
-	${CMAKE_CURRENT_SOURCE_DIR}/src/fs-poll.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/inet.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/queue.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/uv-common.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/uv-common.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/version.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/fs-poll.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/inet.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/queue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/uv-common.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/uv-common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.c)
 
 
 set(UV_WIN32_SRCS
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/async.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/core.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/dl.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/error.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/fs.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/fs-event.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/getaddrinfo.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/getnameinfo.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/handle.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/loop-watcher.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/pipe.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/poll.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/process.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/process-stdio.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/req.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/signal.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/stream.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/tcp.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/thread.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/threadpool.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/timer.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/tty.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/udp.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/util.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/winapi.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/win/winsock.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/async.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/core.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/dl.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/error.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/fs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/fs-event.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/getaddrinfo.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/getnameinfo.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/handle.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/loop-watcher.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/pipe.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/poll.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/process-stdio.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/req.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/signal.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/stream.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/tcp.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/thread.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/threadpool.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/timer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/tty.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/udp.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/util.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/winapi.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/winsock.c)
 
 set(UV_POSIX_SRCS
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/async.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/core.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/dl.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fs.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/getaddrinfo.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/loop.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/loop-watcher.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/pipe.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/poll.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/process.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/proctitle.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/signal.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/stream.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/tcp.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/thread.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/threadpool.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/timer.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/tty.c
-	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/udp.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/async.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/core.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/dl.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/getaddrinfo.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/loop.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/loop-watcher.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/pipe.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/poll.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/proctitle.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/signal.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/stream.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/tcp.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/thread.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/threadpool.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/timer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/tty.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/udp.c)
 
 
 # set UV_SRCS and UV_LIBS
@@ -86,8 +86,8 @@ else()
             ${UV_POSIX_SRCS}
             ${UV_COMMON_SRCS}
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/darwin.c
-			${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c
-			${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fsevents.c)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fsevents.c)
         set(UV_LIBS m -pthread)
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         add_definitions(-DEV_CONFIG_H=\"config_linux.h\" -DEIO_CONFIG_H=\"config_linux.h\")
@@ -109,11 +109,11 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/freebsd.c
 ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c)
         set(UV_LIBS m -pthread)
     else()
-    	message(ERROR "Unsupported platform")
-    	#	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/aix.c
-    	#	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/netbsd.c
-		#	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/openbsd.c
-		#	${CMAKE_CURRENT_SOURCE_DIR}/src/unix/sunos.c
+        message(ERROR "Unsupported platform")
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/aix.c
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/netbsd.c
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/openbsd.c
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/sunos.c
     endif()
 endif()
 
