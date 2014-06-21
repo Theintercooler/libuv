@@ -377,16 +377,16 @@ fallback:
 
 int uv_fs_event_stop(uv_fs_event_t* handle) {
   if (!uv__is_active(handle))
-    return -EINVAL;
+    return 0;
 
   uv__handle_stop(handle);
 
 #if defined(__APPLE__)
   if (uv__fsevents_close(handle))
-    uv__io_stop(handle->loop, &handle->event_watcher, UV__POLLIN);
-#else
-  uv__io_stop(handle->loop, &handle->event_watcher, UV__POLLIN);
 #endif /* defined(__APPLE__) */
+  {
+    uv__io_close(handle->loop, &handle->event_watcher);
+  }
 
   free(handle->path);
   handle->path = NULL;

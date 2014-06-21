@@ -63,36 +63,6 @@ static void uv__stream_io(uv_loop_t* loop, uv__io_t* w, unsigned int events);
 static size_t uv__write_req_size(uv_write_t* req);
 
 
-/* Used by the accept() EMFILE party trick. */
-static int uv__open_cloexec(const char* path, int flags) {
-  int err;
-  int fd;
-
-#if defined(__linux__)
-  fd = open(path, flags | UV__O_CLOEXEC);
-  if (fd != -1)
-    return fd;
-
-  if (errno != EINVAL)
-    return -errno;
-
-  /* O_CLOEXEC not supported. */
-#endif
-
-  fd = open(path, flags);
-  if (fd == -1)
-    return -errno;
-
-  err = uv__cloexec(fd, 1);
-  if (err) {
-    uv__close(fd);
-    return err;
-  }
-
-  return fd;
-}
-
-
 static size_t uv_count_bufs(const uv_buf_t bufs[], unsigned int nbufs) {
   unsigned int i;
   size_t bytes;
@@ -254,7 +224,7 @@ static void uv__stream_osx_select(void* arg) {
 }
 
 
-static void uv__stream_osx_select_cb(uv_async_t* handle, int status) {
+static void uv__stream_osx_select_cb(uv_async_t* handle) {
   uv__stream_select_t* s;
   uv_stream_t* stream;
   int events;
@@ -474,6 +444,7 @@ void uv__stream_destroy(uv_stream_t* stream) {
  */
 static int uv__emfile_trick(uv_loop_t* loop, int accept_fd) {
   int err;
+  int emfile_fd;
 
   if (loop->emfile_fd == -1)
     return -EMFILE;
@@ -487,7 +458,10 @@ static int uv__emfile_trick(uv_loop_t* loop, int accept_fd) {
       uv__close(err);
   } while (err >= 0 || err == -EINTR);
 
-  SAVE_ERRNO(loop->emfile_fd = uv__open_cloexec("/", O_RDONLY));
+  emfile_fd = uv__open_cloexec("/", O_RDONLY);
+  if (emfile_fd >= 0)
+    loop->emfile_fd = emfile_fd;
+
   return err;
 }
 
@@ -1157,7 +1131,7 @@ static void uv__read(uv_stream_t* stream) {
       if (is_ipc) {
         err = uv__stream_recv_cmsg(stream, &msg);
         if (err != 0) {
-          stream->read_cb(stream, err, NULL);
+          stream->read_cb(stream, err, &buf);
           return;
         }
       }
@@ -1512,8 +1486,8 @@ int uv_is_writable(const uv_stream_t* stream) {
 
 
 #if defined(__APPLE__)
-int uv___stream_fd(uv_stream_t* handle) {
-  uv__stream_select_t* s;
+int uv___stream_fd(const uv_stream_t* handle) {
+  const uv__stream_select_t* s;
 
   assert(handle->type == UV_TCP ||
          handle->type == UV_TTY ||

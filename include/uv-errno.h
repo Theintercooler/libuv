@@ -39,7 +39,6 @@
 #define UV__EAI_OVERFLOW    (-3009)
 #define UV__EAI_SERVICE     (-3010)
 #define UV__EAI_SOCKTYPE    (-3011)
-#define UV__EAI_SYSTEM      (-3012) /* TODO(bnoordhuis) Return system error. */
 #define UV__EAI_BADHINTS    (-3013)
 #define UV__EAI_PROTOCOL    (-3014)
 
@@ -398,6 +397,12 @@
 # define UV__ENXIO (-ENXIO)
 #else
 # define UV__ENXIO (-4033)
+#endif
+
+#if defined(EMLINK) && !defined(_WIN32)
+# define UV__EMLINK (-EMLINK)
+#else
+# define UV__EMLINK (-4032)
 #endif
 
 #endif /* UV_ERRNO_H_ */

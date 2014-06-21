@@ -26,8 +26,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _WIN32
-#include <unistd.h>
+#ifdef _WIN32
+# if defined(__MINGW32__)
+#  include <basetyps.h>
+# endif
+# include <shellapi.h>
+#else
+# include <unistd.h>
 #endif
 
 
@@ -146,13 +151,13 @@ static void init_process_options(char* test, uv_exit_cb exit_cb) {
 }
 
 
-static void timer_cb(uv_timer_t* handle, int status) {
+static void timer_cb(uv_timer_t* handle) {
   uv_process_kill(&process, /* SIGTERM */ 15);
   uv_close((uv_handle_t*)handle, close_cb);
 }
 
 
-static void timer_counter_cb(uv_timer_t* handle, int status) {
+static void timer_counter_cb(uv_timer_t* handle) {
   ++timer_counter;
 }
 
@@ -166,6 +171,7 @@ TEST_IMPL(spawn_fails) {
   r = uv_spawn(uv_default_loop(), &process, &options);
   ASSERT(r == UV_ENOENT || r == UV_EACCES);
   ASSERT(0 == uv_is_active((uv_handle_t*) &process));
+  uv_close((uv_handle_t*) &process, NULL);
   ASSERT(0 == uv_run(uv_default_loop(), UV_RUN_DEFAULT));
 
   MAKE_VALGRIND_HAPPY();
@@ -680,6 +686,38 @@ TEST_IMPL(spawn_same_stdout_stderr) {
 }
 
 
+TEST_IMPL(spawn_closed_process_io) {
+  uv_pipe_t in;
+  uv_write_t write_req;
+  uv_buf_t buf;
+  uv_stdio_container_t stdio[2];
+  static char buffer[] = "hello-from-spawn_stdin\n";
+
+  init_process_options("spawn_helper3", exit_cb);
+
+  uv_pipe_init(uv_default_loop(), &in, 0);
+  options.stdio = stdio;
+  options.stdio[0].flags = UV_CREATE_PIPE | UV_READABLE_PIPE;
+  options.stdio[0].data.stream = (uv_stream_t*) &in;
+  options.stdio_count = 1;
+
+  close(0); /* Close process stdin. */
+
+  ASSERT(0 == uv_spawn(uv_default_loop(), &process, &options));
+
+  buf = uv_buf_init(buffer, sizeof(buffer));
+  ASSERT(0 == uv_write(&write_req, (uv_stream_t*) &in, &buf, 1, write_cb));
+
+  ASSERT(0 == uv_run(uv_default_loop(), UV_RUN_DEFAULT));
+
+  ASSERT(exit_cb_called == 1);
+  ASSERT(close_cb_called == 2); /* process, child stdin */
+
+  MAKE_VALGRIND_HAPPY();
+  return 0;
+}
+
+
 TEST_IMPL(kill) {
   int r;
 
@@ -770,6 +808,7 @@ WCHAR* quote_cmd_arg(const WCHAR *source, WCHAR *target);
 
 TEST_IMPL(argument_escaping) {
   const WCHAR* test_str[] = {
+    L"",
     L"HelloWorld",
     L"Hello World",
     L"Hello\"World",
@@ -799,6 +838,7 @@ TEST_IMPL(argument_escaping) {
   WCHAR* non_verbatim_output;
 
   test_output = calloc(count, sizeof(WCHAR*));
+  ASSERT(test_output != NULL);
   for (i = 0; i < count; ++i) {
     test_output[i] = calloc(2 * (wcslen(test_str[i]) + 2), sizeof(WCHAR));
     quote_cmd_arg(test_str[i], test_output[i]);
@@ -807,6 +847,7 @@ TEST_IMPL(argument_escaping) {
     total_size += wcslen(test_output[i]) + 1;
   }
   command_line = calloc(total_size + 1, sizeof(WCHAR));
+  ASSERT(command_line != NULL);
   for (i = 0; i < count; ++i) {
     wcscat(command_line, test_output[i]);
     wcscat(command_line, L" ");
@@ -896,6 +937,28 @@ TEST_IMPL(environment_creation) {
 
   ASSERT(wcscmp(expected, env) == 0);
 
+  return 0;
+}
+
+// Regression test for issue #909
+TEST_IMPL(spawn_with_an_odd_path) {
+  int r;
+
+  char newpath[2048];
+  char *path = getenv("PATH");
+  ASSERT(path != NULL);
+  snprintf(newpath, 2048, ";.;%s", path);
+  SetEnvironmentVariable("PATH", path);
+
+  init_process_options("", exit_cb);
+  options.file = options.args[0] = "program-that-had-better-not-exist";
+  r = uv_spawn(uv_default_loop(), &process, &options);
+  ASSERT(r == UV_ENOENT || r == UV_EACCES);
+  ASSERT(0 == uv_is_active((uv_handle_t*) &process));
+  uv_close((uv_handle_t*) &process, NULL);
+  ASSERT(0 == uv_run(uv_default_loop(), UV_RUN_DEFAULT));
+
+  MAKE_VALGRIND_HAPPY();
   return 0;
 }
 #endif
