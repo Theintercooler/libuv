@@ -26,13 +26,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <crtdbg.h>
 
 #include "uv.h"
 #include "internal.h"
 #include "handle-inl.h"
 #include "req-inl.h"
 
+#ifdef NEED_CRT_ASSERT_ENABLED
+# include <crtdbg.h>
+#endif
 
 /* The only event loop we support right now */
 static uv_loop_t uv_default_loop_;
@@ -42,7 +44,7 @@ static uv_once_t uv_init_guard_ = UV_ONCE_INIT;
 static uv_once_t uv_default_loop_init_guard_ = UV_ONCE_INIT;
 
 
-#if defined(_DEBUG)
+#ifdef NEED_CRT_ASSERT_ENABLED
 /* Our crt debug report handler allows us to temporarily disable asserts */
 /* just for the current thread. */
 
@@ -91,7 +93,7 @@ static void uv_init(void) {
   /* We also need to setup our debug report handler because some CRT */
   /* functions (eg _get_osfhandle) raise an assert when called with invalid */
   /* FDs even though they return the proper error code in the release build. */
-#if defined(_DEBUG) && !defined(__MINGW32__)
+#ifdef NEED_CRT_ASSERT_ENABLED
   _CrtSetReportHook(uv__crt_dbg_report_handler);
 #endif
 

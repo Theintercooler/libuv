@@ -37,8 +37,11 @@
 # define UV_THREAD_LOCAL __thread
 #endif
 
+#if defined(_DEBUG) && !defined(__MINGW32__)
+# define NEED_CRT_ASSERT_ENABLED
+#endif
 
-#ifdef _DEBUG
+#ifdef NEED_CRT_ASSERT_ENABLED
 
 extern UV_THREAD_LOCAL int uv__crt_assert_enabled;
 
