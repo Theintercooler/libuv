@@ -72,7 +72,7 @@ set(UV_POSIX_SRCS
 if(WIN32)
     add_definitions(-D_WIN32_WINNT=0x0502 -DEIO_STACKSIZE=262144 -D_GNU_SOURCE)
     set(UV_SRCS ${UV_WIN32_SRCS} ${UV_COMMON_SRCS})
-    set(UV_LIBS ws2_32 psapi iphlpapi)
+    set(UV_LIBS "ws2_32;psapi;iphlpapi")
 else()
     # POSIX common
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/unix/ev)
@@ -88,7 +88,7 @@ else()
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/darwin.c
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/fsevents.c)
-        set(UV_LIBS m -pthread)
+        set(UV_LIBS "m;-pthread")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         add_definitions(-DEV_CONFIG_H=\"config_linux.h\" -DEIO_CONFIG_H=\"config_linux.h\")
         include_directories(src/ares/config_linux)
@@ -96,18 +96,18 @@ else()
             ${UV_POSIX_SRCS}
             ${UV_COMMON_SRCS}
             ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-core.c
-${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-inotify.c
-${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-syscalls.c)
-        set(UV_LIBS rt m -pthread)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-inotify.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/linux-syscalls.c)
+        set(UV_LIBS "rt;m;-pthread")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
         add_definitions(-DEV_CONFIG_H=\"config_freebsd.h\" -DEIO_CONFIG_H=\"config_freebsd.h\")
         include_directories(src/ares/config_freebsd)
         set(UV_SRCS
             ${UV_POSIX_SRCS}
             ${UV_COMMON_SRCS}
-${CMAKE_CURRENT_SOURCE_DIR}/src/unix/freebsd.c
-${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c)
-        set(UV_LIBS m -pthread)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/freebsd.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/kqueue.c)
+        set(UV_LIBS "m;-pthread")
     else()
         message(ERROR "Unsupported platform")
         #    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/aix.c
@@ -124,7 +124,7 @@ add_library(${UV_LIBRARY} STATIC ${UV_SRCS})
 target_link_libraries(${UV_LIBRARY} ${UV_LIBS})
 
 
-set(UV_LIBRARIES ${UV_LIBRARY} ${UV_LIBS} CACHE INTERNAL "Uv libraries")
+set(UV_LIBRARIES "${UV_LIBRARY};${UV_LIBS}" CACHE INTERNAL "Uv libraries")
 set(UV_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE INTERNAL "Uv include directories")
 mark_as_advanced(UV_LIBRARIES)
 mark_as_advanced(UV_INCLUDE_DIRS)
