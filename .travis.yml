@@ -3,13 +3,19 @@ before_install:
   # Install dependencies
   - sudo apt-get update
   - sudo apt-get -y install build-essential
+  - sudo apt-get -y install mingw32
 
 script:
-  - (mkdir cmakebuild && cd cmakebuild && cmake .. && make -j5 && cd .. && rm -rf cmakebuild)
+  - wget https://raw.githubusercontent.com/Theintercooler/Platform-Windows/master/linux-toolchain-mingw.cmake
+  - (mkdir cmakebuild && cd cmakebuild && cmake $CMAKE_FLAGS .. && make -j5 && cd .. && rm -rf cmakebuild)
 
 compiler:
   - clang
   - gcc
+
+env:
+  - CMAKE_FLAGS=
+  - CMAKE_FLAGS="-DCMAKE_TOOLCHAIN_FILE=../linux-toolchain-mingw.cmake -DMINGW_TYPE=classic"
 
 notifications:
   webhooks: http://n.tkte.ch/h/1187/bzOwZEFZDLNMMt0CEto-XdvN
