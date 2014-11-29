@@ -679,8 +679,13 @@ static void uv__to_stat(struct stat* src, uv_stat_t* dst) {
   dst->st_mtim.tv_nsec = src->st_mtimespec.tv_nsec;
   dst->st_ctim.tv_sec = src->st_ctimespec.tv_sec;
   dst->st_ctim.tv_nsec = src->st_ctimespec.tv_nsec;
+#ifdef __DARWIN_64_BIT_INO_T
+  dst->st_birthtim.tv_sec = src->st_ctimespec.tv_sec;
+  dst->st_birthtim.tv_nsec = src->st_ctimespec.tv_nsec;
+#else
   dst->st_birthtim.tv_sec = src->st_birthtimespec.tv_sec;
   dst->st_birthtim.tv_nsec = src->st_birthtimespec.tv_nsec;
+#endif
   dst->st_flags = src->st_flags;
   dst->st_gen = src->st_gen;
 #elif defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE)
