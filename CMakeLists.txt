@@ -14,7 +14,8 @@ set(UV_COMMON_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/queue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/uv-common.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/uv-common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/threadpool.c)
 
 
 set(UV_WIN32_SRCS
@@ -37,7 +38,6 @@ set(UV_WIN32_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/win/stream.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/win/tcp.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/win/thread.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/win/threadpool.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/win/timer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/win/tty.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/win/udp.c

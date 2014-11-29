@@ -38,7 +38,6 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <utime.h>
@@ -214,9 +213,23 @@ skip:
 }
 
 
+static ssize_t uv__fs_mkdtemp(uv_fs_t* req) {
+  return mkdtemp((char*) req->path) ? 0 : -1;
+}
+
+
 static ssize_t uv__fs_read(uv_fs_t* req) {
   ssize_t result;
 
+#if defined(_AIX)
+  struct stat buf;
+  if(fstat(req->file, &buf))
+    return -1;
+  if(S_ISDIR(buf.st_mode)) {
+    errno = EISDIR;
+    return -1;
+  }
+#endif /* defined(_AIX) */
   if (req->off < 0) {
     if (req->nbufs == 1)
       result = read(req->file, req->bufs[0].base, req->bufs[0].len);
@@ -282,63 +295,46 @@ done:
 
 
 #if defined(__OpenBSD__) || (defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_8))
-static int uv__fs_readdir_filter(struct dirent* dent) {
+static int uv__fs_scandir_filter(uv__dirent_t* dent) {
 #else
-static int uv__fs_readdir_filter(const struct dirent* dent) {
+static int uv__fs_scandir_filter(const uv__dirent_t* dent) {
 #endif
   return strcmp(dent->d_name, ".") != 0 && strcmp(dent->d_name, "..") != 0;
 }
 
 
-/* This should have been called uv__fs_scandir(). */
-static ssize_t uv__fs_readdir(uv_fs_t* req) {
-  struct dirent **dents;
+static ssize_t uv__fs_scandir(uv_fs_t* req) {
+  uv__dirent_t **dents;
   int saved_errno;
-  size_t off;
-  size_t len;
-  char *buf;
-  int i;
   int n;
 
   dents = NULL;
-  n = scandir(req->path, &dents, uv__fs_readdir_filter, alphasort);
+  n = scandir(req->path, &dents, uv__fs_scandir_filter, alphasort);
+
+  /* NOTE: We will use nbufs as an index field */
+  req->nbufs = 0;
 
   if (n == 0)
     goto out; /* osx still needs to deallocate some memory */
   else if (n == -1)
     return n;
 
-  len = 0;
+  req->ptr = dents;
 
-  for (i = 0; i < n; i++)
-    len += strlen(dents[i]->d_name) + 1;
-
-  buf = malloc(len);
-
-  if (buf == NULL) {
-    errno = ENOMEM;
-    n = -1;
-    goto out;
-  }
-
-  off = 0;
-
-  for (i = 0; i < n; i++) {
-    len = strlen(dents[i]->d_name) + 1;
-    memcpy(buf + off, dents[i]->d_name, len);
-    off += len;
-  }
-
-  req->ptr = buf;
+  return n;
 
 out:
   saved_errno = errno;
   if (dents != NULL) {
+    int i;
+
     for (i = 0; i < n; i++)
       free(dents[i]);
     free(dents);
   }
   errno = saved_errno;
+
+  req->ptr = NULL;
 
   return n;
 }
@@ -688,7 +684,8 @@ static void uv__to_stat(struct stat* src, uv_stat_t* dst) {
 #endif
   dst->st_flags = src->st_flags;
   dst->st_gen = src->st_gen;
-#elif defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE)
+#elif !defined(_AIX) && \
+  (defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE))
   dst->st_atim.tv_sec = src->st_atim.tv_sec;
   dst->st_atim.tv_nsec = src->st_atim.tv_nsec;
   dst->st_mtim.tv_sec = src->st_mtim.tv_sec;
@@ -771,6 +768,7 @@ static void uv__fs_work(struct uv__work* w) {
     break;
 
     switch (req->fs_type) {
+    X(ACCESS, access(req->path, req->flags));
     X(CHMOD, chmod(req->path, req->mode));
     X(CHOWN, chown(req->path, req->uid, req->gid));
     X(CLOSE, close(req->file));
@@ -784,8 +782,9 @@ static void uv__fs_work(struct uv__work* w) {
     X(LSTAT, uv__fs_lstat(req->path, &req->statbuf));
     X(LINK, link(req->path, req->new_path));
     X(MKDIR, mkdir(req->path, req->mode));
+    X(MKDTEMP, uv__fs_mkdtemp(req));
     X(READ, uv__fs_read(req));
-    X(READDIR, uv__fs_readdir(req));
+    X(SCANDIR, uv__fs_scandir(req));
     X(READLINK, uv__fs_readlink(req));
     X(RENAME, rename(req->path, req->new_path));
     X(RMDIR, rmdir(req->path));
@@ -857,6 +856,18 @@ static void uv__fs_done(struct uv__work* w, int status) {
 
   if (req->cb != NULL)
     req->cb(req);
+}
+
+
+int uv_fs_access(uv_loop_t* loop,
+                 uv_fs_t* req,
+                 const char* path,
+                 int flags,
+                 uv_fs_cb cb) {
+  INIT(ACCESS);
+  PATH;
+  req->flags = flags;
+  POST;
 }
 
 
@@ -996,6 +1007,18 @@ int uv_fs_mkdir(uv_loop_t* loop,
 }
 
 
+int uv_fs_mkdtemp(uv_loop_t* loop,
+                  uv_fs_t* req,
+                  const char* tpl,
+                  uv_fs_cb cb) {
+  INIT(MKDTEMP);
+  req->path = strdup(tpl);
+  if (req->path == NULL)
+    return -ENOMEM;
+  POST;
+}
+
+
 int uv_fs_open(uv_loop_t* loop,
                uv_fs_t* req,
                const char* path,
@@ -1034,12 +1057,12 @@ int uv_fs_read(uv_loop_t* loop, uv_fs_t* req,
 }
 
 
-int uv_fs_readdir(uv_loop_t* loop,
+int uv_fs_scandir(uv_loop_t* loop,
                   uv_fs_t* req,
                   const char* path,
                   int flags,
                   uv_fs_cb cb) {
-  INIT(READDIR);
+  INIT(SCANDIR);
   PATH;
   req->flags = flags;
   POST;
@@ -1160,6 +1183,9 @@ void uv_fs_req_cleanup(uv_fs_t* req) {
   free((void*) req->path);
   req->path = NULL;
   req->new_path = NULL;
+
+  if (req->fs_type == UV_FS_SCANDIR && req->ptr != NULL)
+    uv__fs_scandir_cleanup(req);
 
   if (req->ptr != &req->statbuf)
     free(req->ptr);
