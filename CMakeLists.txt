@@ -61,7 +61,6 @@ set(UV_POSIX_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/stream.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/tcp.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/thread.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/threadpool.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/timer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/tty.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/udp.c)
